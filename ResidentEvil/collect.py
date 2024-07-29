@@ -1,6 +1,8 @@
 # %%
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm   #good to know estimated time for the collect 
+import pandas as pd
 
 headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -25,10 +27,7 @@ def get_content(url):
 
 def get_basic_infos(soup):
     div_page = soup.find("div", class_ = "td-page-content")
-    nome = div_page.find_all("p")[0]
     paragrafo = div_page.find_all("p")[1]
-    img = nome.find('img')
-    nome = img.get('alt', 'default_value')
     ems = paragrafo.find_all("em")
     data = {}
     for i in ems:
@@ -68,13 +67,23 @@ def get_personagens_infos(url):
 # %%
 links = get_links()
 data = []
-for i in links:
+for i in tqdm(links):
     d = get_personagens_infos(i)
-    print(d)
     if d is not None:
-        d["link"] = i
+        d["Link"] = i
+        nome = i.strip("/").split("/")[-1].replace("-", " ").title()  # title() replace capital letters
+        d["Nome"] = nome
         data.append(d)
 
 # %%
-data
+df = pd.DataFrame(data)
+df
+# %%
+df[~df["de nascimento"].isna()]
+df.to_parquet("dados_re.parquet", index=False) # parquet is a binary format better to save than csv
+df.to_pickle("dados_re.pkl") # pickle is also binary, but it stores literally the python objet, in this case, the panda.framework object in your disk
+#df_new = pd.read_parquet("dados_re.parquet")
+#df_new2 = pd.read_pickle("dados_re.pkl")
+
+
 # %%
