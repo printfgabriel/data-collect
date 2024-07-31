@@ -34,7 +34,6 @@ def get_basic_infos(soup):
         chave, valor, *_ = i.text.split(":")
         chave = chave.strip(" ")
         data[chave]  = valor.strip(" ")
-    data["Nome"] = nome
     return data
 
 def get_aparicoes(soup):
@@ -72,6 +71,7 @@ for i in tqdm(links):
     if d is not None:
         d["Link"] = i
         nome = i.strip("/").split("/")[-1].replace("-", " ").title()  # title() replace capital letters
+        print(nome)
         d["Nome"] = nome
         data.append(d)
 
