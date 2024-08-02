@@ -43,7 +43,7 @@ class Collector:
             print(f"Request sem sucesso: {resp.status_code}", resp.json())
         return data
 
-    def auto_exec(self, date_stop='2000-01-01'):
+    def auto_exec(self, save_format='json', date_stop='2000-01-01'):
         page = 1
         while True:
             data = self.get_and_save(save_format=save_format, page=page, per_page=10000 )
@@ -52,11 +52,12 @@ class Collector:
                 time.sleep()
 
             else:
-                date_last = pd.to_datetime(data[-1]["published_at"]).date()
-                if date_last < pd.to_datetime(date_stop).date():
+                # date_last = pd.to_datetime(data[-1]["published_at"]).date()
+                # if date_last < pd.to_datetime(date_stop).date():
+                #     break
+                if len(data)<1000:
                     break
-                elif len(data)<1000:
-                    break
+                page += 1
                 time.sleep(5)
 
 # %%
@@ -65,6 +66,6 @@ url = "https://api.jovemnerd.com.br/wp-json/jovemnerd/v1/nerdcasts/"
 collect = Collector(url, "episodios")
 
 # %%
-collect.get_and_save()
+collect.auto_exec()
 
 # %%
